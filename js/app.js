@@ -1,6 +1,6 @@
 import { loadEngine, composeVideo, cancelEngine, recentLog } from "./engine.js";
 import {
-  platformName, isInAppBrowser, isStandalone, isIOS,
+  platformName, isInAppBrowser, isStandalone, isIOS, isAndroid, chromeIntentUrl, copyPageLink,
   outputFileName, downloadBlob, shareFile, supportsFileShare, keepScreenOn,
 } from "./platform.js";
 
@@ -196,8 +196,28 @@ function showSaveTip(html) {
   ui.saveTip.hidden = false;
 }
 
+const IN_APP_SAVE_TIP =
+  "<b>Trình duyệt trong Zalo/Messenger không cho lưu video.</b> Bấm <b>Mở bằng Chrome</b> (iPhone: mở bằng <b>Safari</b>) " +
+  "ở khung cảnh báo phía trên, rồi chọn lại 2 video và ghép lại (khoảng 1 phút).";
+
+async function saveInsideInAppBrowser() {
+  // Một số app có hỗ trợ bảng chia sẻ; thử trước, không được thì hướng dẫn sang trình duyệt thật.
+  try {
+    const r = await shareFile(resultFile);
+    if (r === "shared" || r === "cancelled") return;
+  } catch {
+    // Không chia sẻ được: rơi xuống hướng dẫn bên dưới.
+  }
+  showSaveTip(IN_APP_SAVE_TIP);
+  $("inAppWarning").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 async function save() {
   if (!resultFile) return;
+  if (isInAppBrowser) {
+    await saveInsideInAppBrowser();
+    return;
+  }
   if (isIOS) {
     try {
       const r = await shareFile(resultFile);
@@ -235,9 +255,28 @@ function selectGuideOS(os) {
   for (const el of document.querySelectorAll(".os-android")) el.hidden = os !== "android";
 }
 
+// Mở mục hướng dẫn theo #id (kể cả khung "Hướng dẫn sử dụng" bao ngoài đang đóng).
 function openGuideTarget() {
-  const target = document.getElementById(location.hash.slice(1));
-  if (target?.tagName === "DETAILS") target.open = true;
+  let node = document.getElementById(location.hash.slice(1));
+  while (node) {
+    if (node.tagName === "DETAILS") node.open = true;
+    node = node.parentElement;
+  }
+}
+
+function setupInAppWarning() {
+  const box = $("inAppWarning");
+  box.hidden = !isInAppBrowser;
+  if (!isInAppBrowser) return;
+  const openChrome = $("openChromeBtn");
+  openChrome.hidden = !isAndroid;
+  openChrome.addEventListener("click", () => { window.location.href = chromeIntentUrl(); });
+  $("copyLinkBtn").addEventListener("click", async () => {
+    const ok = await copyPageLink();
+    $("copyLinkHint").textContent = ok
+      ? `Đã sao chép link. Mở ${isIOS ? "Safari" : "Chrome"}, chạm vào thanh địa chỉ, dán link rồi bấm Đi.`
+      : `Không sao chép tự động được. Link: ${window.location.href.split("#")[0]}`;
+  });
 }
 
 // ---------- Khởi động ----------
@@ -266,10 +305,16 @@ function init() {
     tab.addEventListener("click", () => selectGuideOS(tab.dataset.os));
   }
   window.addEventListener("hashchange", openGuideTarget);
+  document.addEventListener("click", (e) => {
+    // Bấm lại cùng một link #huong-dan-… không đổi hash → tự mở mục tương ứng.
+    const a = e.target.closest?.('a[href^="#huong-dan"]');
+    if (a && a.getAttribute("href") === location.hash) openGuideTarget();
+  });
 
   const os = platformName();
   selectGuideOS(os === "android" ? "android" : "ios");
-  $("inAppWarning").hidden = !isInAppBrowser;
+  document.body.classList.add(os === "android" ? "is-android" : "is-ios");
+  setupInAppWarning();
   $("installBanner").hidden = isStandalone || isInAppBrowser || os === "other";
   updateStartState();
   registerServiceWorker();

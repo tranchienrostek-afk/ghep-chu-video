@@ -4,9 +4,40 @@ const ua = navigator.userAgent || "";
 
 export const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 export const isAndroid = /Android/i.test(ua);
-export const isInAppBrowser = /Zalo|FBAN|FBAV|FB_IAB|Instagram|Line\/|TikTok|musical_ly/i.test(ua);
 export const isStandalone =
   window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone === true;
+
+// Trình duyệt nhúng trong app (Zalo, Messenger, Facebook…) không lưu được file do trang tự tạo.
+// Nhận diện theo tên app VÀ theo dấu hiệu chung, vì không phải app nào cũng ghi tên vào User-Agent:
+//  - Android WebView: có "; wv)" hoặc "Version/x.y Chrome/" (Chrome thật không có "Version/").
+//  - iOS WebView: không có "Safari/" (Safari, Chrome iOS đều có; web app đã cài thì bỏ qua).
+const NAMED_IN_APP = /Zalo|FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|TikTok|musical_ly|Snapchat|Twitter/i;
+const isAndroidWebView = isAndroid && (/; wv\)/.test(ua) || /Version\/[\d.]+ Chrome\//.test(ua));
+const isIOSWebView = isIOS && !isStandalone && !/Safari\//.test(ua);
+export const isInAppBrowser = NAMED_IN_APP.test(ua) || isAndroidWebView || isIOSWebView;
+
+/** Link intent mở đúng trang này trong Chrome (Android). */
+export function chromeIntentUrl(loc = window.location) {
+  return `intent://${loc.host}${loc.pathname}${loc.search}#Intent;scheme=https;package=com.android.chrome;end`;
+}
+
+/** Sao chép link trang hiện tại. @returns {Promise<boolean>} */
+export async function copyPageLink() {
+  const url = window.location.href.split("#")[0];
+  try {
+    await navigator.clipboard.writeText(url);
+    return true;
+  } catch {
+    const input = document.createElement("input");
+    input.value = url;
+    input.setAttribute("readonly", "");
+    document.body.appendChild(input);
+    input.select();
+    const ok = document.execCommand?.("copy") ?? false;
+    input.remove();
+    return ok;
+  }
+}
 
 /** @returns {"ios"|"android"|"other"} */
 export function platformName() {

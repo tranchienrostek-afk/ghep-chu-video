@@ -1,7 +1,7 @@
 // Service worker: cho app mở được khi không có mạng và không phải tải lại bộ xử lý 32 MB.
 // - Giao diện (html/css/js/icon): lấy mạng trước để luôn có bản mới, mất mạng thì dùng bản đã lưu.
 // - Thư viện ffmpeg (vendor/): lấy bộ nhớ đệm trước, vì file lớn và không đổi trong một phiên bản.
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL_CACHE = `shell-${VERSION}`;
 const VENDOR_CACHE = `vendor-${VERSION}`;
 

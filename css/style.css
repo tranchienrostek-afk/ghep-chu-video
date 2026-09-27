@@ -182,8 +182,17 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 #errorMsg { color: var(--danger); font-weight: 600; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.75rem; max-height: 240px; overflow: auto; background: var(--bg); padding: 8px; border-radius: 8px; }
 
-.guide { margin: 26px 0 10px; }
-.guide-title { font-size: 1.2rem; }
+.guide { margin: 22px 0 10px; }
+.guide > summary.guide-title { font-size: 1.1rem; padding: 15px 0; }
+.guide-hint { font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 4px; }
+.guide[open] > summary .guide-hint { display: none; }
+.guide details { background: var(--bg); }
+
+.inapp { font-size: 0.95rem; }
+.inapp p { margin: 6px 0; }
+.inapp button { margin-top: 8px; }
+.os-android-inline, .os-ios-inline { display: none; }
+.is-android .os-android-inline, .is-ios .os-ios-inline { display: inline; }
 .tabs { display: flex; gap: 6px; margin: 10px 0; }
 .tabs button { margin: 0; background: var(--card); border-color: var(--line); color: var(--text); }
 .tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 600; }
