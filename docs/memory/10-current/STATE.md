@@ -1,7 +1,7 @@
 ---
 memory_flow: 1
 status: initialized
-last_verified_commit: (first commit)
+last_verified_commit: da87436 (gh-pages) / main
 ---
 # Current State
 
@@ -43,4 +43,5 @@ PWA tĩnh "Ghép Chữ Video" (thư mục `app/`, đăng lên GitHub Pages từ 
 ## Verification baseline
 
 - `node --test test/filter.test.mjs`: 8/8 ca đạt (ffmpeg desktop 8.1.2).
-- `node test/e2e.mjs chromium fast` và `webkit fast`: đạt. Ghép mất 27–34s cho video 11s. Kết quả 333/333 khung khớp video gốc (TB 41.2 dB ở vùng không có chữ). Bước Hủy khi đang tải lõi hoạt động đúng.
+- Link chạy thật: https://tranchienrostek-afk.github.io/ghep-chu-video/ (mọi file trả HTTP 200, wasm trả `application/wasm`).
+- `node test/e2e.mjs chromium fast` và `webkit fast` (máy chủ cục bộ): đạt. Có thể chạy trên link thật bằng `E2E_URL=<link>`. Ghép mất 27–34s cho video 11s. Kết quả 333/333 khung khớp video gốc (TB 41.2 dB ở vùng không có chữ). Bước Hủy khi đang tải lõi hoạt động đúng.

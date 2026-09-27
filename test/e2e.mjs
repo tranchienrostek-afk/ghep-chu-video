@@ -1,5 +1,5 @@
 // Chạy thử end-to-end như người dùng: mở app, chọn 2 video, ghép, lấy video kết quả ra so sánh.
-// Dùng: node test/e2e.mjs [chromium|webkit] [fast|high]
+// Dùng: node test/e2e.mjs [chromium|webkit] [fast|high]   (E2E_URL=https://... để chạy trên bản đã đăng)
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { startServer } from "./serve.mjs";
@@ -11,7 +11,9 @@ const OUT = "test/out";
 const PROCESS_TIMEOUT_MS = 15 * 60_000;
 
 mkdirSync(OUT, { recursive: true });
-const server = await startServer("app", PORT);
+// E2E_URL: chạy trên bản đã đăng (vd. GitHub Pages) thay vì máy chủ cục bộ.
+const BASE_URL = process.env.E2E_URL || `http://127.0.0.1:${PORT}/`;
+const server = process.env.E2E_URL ? null : await startServer("app", PORT);
 const engine = browserName === "webkit" ? webkit : chromium;
 const device = browserName === "webkit" ? devices["iPhone 13"] : devices["Pixel 7"];
 const browser = await engine.launch();
@@ -23,7 +25,7 @@ page.on("console", (m) => { if (m.type() === "error") problems.push(`console: ${
 
 const tag = `${browserName}_${quality}`;
 try {
-  await page.goto(`http://127.0.0.1:${PORT}/`);
+  await page.goto(BASE_URL);
   await page.screenshot({ path: `${OUT}/e2e_${tag}_1_open.png`, fullPage: true });
 
   if (!(await page.locator("#startBtn").isDisabled())) throw new Error("Nút Ghép phải bị khóa khi chưa chọn video");
@@ -90,5 +92,5 @@ try {
   process.exitCode = 1;
 } finally {
   await browser.close();
-  server.close();
+  server?.close();
 }
