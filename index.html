@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ghép Chữ Video</title>
+  <meta name="description" content="Ghép lớp chữ trắng nền đen lên video, xử lý ngay trên điện thoại, không tải video lên mạng.">
+  <meta name="theme-color" content="#111418">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ghép Chữ">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top">
+    <img src="icons/icon-192.png" alt="" width="44" height="44">
+    <div>
+      <h1>Ghép Chữ Video</h1>
+      <p class="sub">Ghép lớp chữ trắng nền đen lên video. Xử lý ngay trên máy, không tải video lên mạng.</p>
+    </div>
+  </header>
+
+  <main>
+    <div id="inAppWarning" class="banner warn" hidden>
+      <strong>Bạn đang mở trong Zalo/Facebook.</strong>
+      Trình duyệt trong app này thường không cho chọn/lưu video. Bấm <b>⋯</b> ở góc trên → <b>Mở bằng trình duyệt</b>
+      (iPhone: Safari, Android: Chrome). <a href="#huong-dan-mo">Xem hướng dẫn</a>
+    </div>
+
+    <div id="installBanner" class="banner info" hidden>
+      Mẹo: cài app lên màn hình chính để mở nhanh như app thật.
+      <a href="#huong-dan-cai">Xem cách cài</a>
+    </div>
+
+    <section class="card" id="stepPick">
+      <h2><span class="num">1</span> Chọn video chính</h2>
+      <p class="hint">Video quay cảnh bạn muốn giữ nguyên hình và tiếng.</p>
+      <label class="picker">
+        <input type="file" id="mainInput" accept="video/*,.mp4,.mov,.m4v">
+        <span class="picker-btn">Chọn video chính</span>
+        <span class="picker-name" id="mainName">Chưa chọn</span>
+      </label>
+      <video id="mainPreview" class="thumb" muted playsinline preload="metadata" hidden></video>
+
+      <h2><span class="num">2</span> Chọn video chữ</h2>
+      <p class="hint">Video <b>chữ trắng trên nền đen</b>. Phần đen sẽ trong suốt, chỉ giữ lại chữ.</p>
+      <label class="picker">
+        <input type="file" id="textInput" accept="video/*,.mp4,.mov,.m4v">
+        <span class="picker-btn">Chọn video chữ</span>
+        <span class="picker-name" id="textName">Chưa chọn</span>
+      </label>
+      <video id="textPreview" class="thumb" muted playsinline preload="metadata" hidden></video>
+    </section>
+
+    <section class="card">
+      <h2><span class="num">3</span> Tùy chọn</h2>
+      <fieldset class="seg" id="outlineSeg">
+        <legend>Viền tối quanh chữ</legend>
+        <label><input type="radio" name="outline" value="0"><span>Không</span></label>
+        <label><input type="radio" name="outline" value="1" checked><span>Mảnh</span></label>
+        <label><input type="radio" name="outline" value="2"><span>Vừa</span></label>
+        <label><input type="radio" name="outline" value="3"><span>Đậm</span></label>
+      </fieldset>
+      <p class="hint">"Mảnh" là mức đã duyệt: chữ sạch, dễ đọc trên nền sáng.</p>
+
+      <fieldset class="seg" id="qualitySeg">
+        <legend>Chất lượng</legend>
+        <label><input type="radio" name="quality" value="fast" checked><span>Nhanh</span></label>
+        <label><input type="radio" name="quality" value="high"><span>Cao nhất</span></label>
+      </fieldset>
+      <p class="hint">"Nhanh": chữ và hình như nhau, xử lý nhanh. "Cao nhất": nén kỹ như bản máy tính, chậm hơn khoảng 3 lần.</p>
+    </section>
+
+    <button id="startBtn" class="primary big" disabled>Ghép video</button>
+    <p class="hint center" id="startHint">Hãy chọn đủ 2 video ở bước 1 và 2.</p>
+
+    <section class="card" id="progressCard" hidden>
+      <h2 id="progressTitle">Đang chuẩn bị…</h2>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><div id="barFill"></div></div>
+      <p class="progress-line"><span id="progressPct">0%</span><span id="elapsed">0:00</span></p>
+      <p class="hint">Giữ màn hình sáng và <b>ở lại trang này</b> cho tới khi xong. Chuyển sang app khác có thể làm quá trình bị dừng.</p>
+      <button id="cancelBtn" class="ghost">Hủy</button>
+    </section>
+
+    <section class="card" id="resultCard" hidden>
+      <h2>✅ Xong! Video đã ghép</h2>
+      <video id="resultVideo" class="result" controls playsinline></video>
+      <p class="hint" id="resultInfo"></p>
+      <button id="saveBtn" class="primary big">Lưu video về máy</button>
+      <button id="shareBtn" class="secondary" hidden>Chia sẻ (Zalo, Facebook…)</button>
+      <div class="banner info" id="saveTip" hidden></div>
+      <button id="againBtn" class="ghost">Ghép video khác</button>
+    </section>
+
+    <section class="card" id="errorCard" hidden>
+      <h2>⚠️ Chưa ghép được</h2>
+      <p id="errorMsg"></p>
+      <details><summary>Chi tiết kỹ thuật (gửi cho người hỗ trợ)</summary><pre id="errorLog"></pre></details>
+      <button id="retryBtn" class="primary">Thử lại</button>
+    </section>
+
+    <section class="guide" id="huong-dan">
+      <h2 class="guide-title">📖 Hướng dẫn sử dụng</h2>
+      <div class="tabs" role="tablist">
+        <button role="tab" data-os="ios" aria-selected="true">iPhone / iPad</button>
+        <button role="tab" data-os="android" aria-selected="false">Android</button>
+      </div>
+
+      <details id="huong-dan-mo" open>
+        <summary>1. Mở app đúng cách</summary>
+        <ol class="os-ios">
+          <li>Mở link app bằng <b>Safari</b> (biểu tượng la bàn xanh).</li>
+          <li>Nếu bạn bấm link từ <b>Zalo / Facebook / Messenger</b>: bấm <b>⋯</b> (hoặc biểu tượng la bàn) ở góc màn hình → <b>Mở bằng Safari</b> / <b>Mở trong trình duyệt</b>.</li>
+          <li>Cần iOS 15 trở lên (Cài đặt → Cài đặt chung → Giới thiệu → Phiên bản iOS).</li>
+        </ol>
+        <ol class="os-android" hidden>
+          <li>Mở link app bằng <b>Chrome</b>.</li>
+          <li>Nếu bạn bấm link từ <b>Zalo / Facebook / Messenger</b>: bấm <b>⋮</b> ở góc trên bên phải → <b>Mở bằng trình duyệt</b> / <b>Mở trong Chrome</b>.</li>
+          <li>Nên cập nhật Chrome lên bản mới nhất (CH Play → tìm "Chrome" → Cập nhật).</li>
+        </ol>
+      </details>
+
+      <details id="huong-dan-cai">
+        <summary>2. Cài app lên màn hình chính (làm 1 lần)</summary>
+        <ol class="os-ios">
+          <li>Trong Safari, bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên chỉ lên, ở thanh dưới cùng hoặc trên cùng).</li>
+          <li>Kéo xuống, chọn <b>Thêm vào MH chính</b> (Add to Home Screen).</li>
+          <li>Bấm <b>Thêm</b> ở góc trên bên phải.</li>
+          <li>Từ giờ mở app bằng biểu tượng <b>Ghép Chữ</b> trên màn hình chính.</li>
+        </ol>
+        <ol class="os-android" hidden>
+          <li>Trong Chrome, bấm <b>⋮</b> ở góc trên bên phải.</li>
+          <li>Chọn <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.</li>
+          <li>Bấm <b>Cài đặt</b> / <b>Thêm</b>.</li>
+          <li>Biểu tượng <b>Ghép Chữ</b> xuất hiện trên màn hình chính và trong danh sách ứng dụng.</li>
+        </ol>
+        <p class="hint">Cài hay không cài đều dùng được. Cài vào chỉ giúp mở nhanh hơn và dùng được cả khi không có mạng (sau lần ghép đầu tiên).</p>
+      </details>
+
+      <details>
+        <summary>3. Chuẩn bị 2 video</summary>
+        <ul>
+          <li><b>Video chính</b>: video cảnh quay của bạn. Hình và tiếng được giữ nguyên.</li>
+          <li><b>Video chữ</b>: chữ <b>trắng</b> trên nền <b>đen tuyệt đối</b>. Phần đen sẽ biến mất, chỉ giữ lại chữ.</li>
+          <li>Hai video nên có <b>cùng tỉ lệ khung</b> (ví dụ cùng quay dọc 9:16). Nếu video chữ khác kích thước, app sẽ tự co giãn cho khớp.</li>
+          <li>Video ghép ra luôn <b>dài bằng video chính</b>. Nếu video chữ dài hơn thì phần thừa bị cắt; nếu ngắn hơn thì sau khi chữ hết chỉ còn video chính.</li>
+          <li>Nên dùng video <b>dưới khoảng 1 phút</b>. Video càng dài, càng nét thì càng lâu và càng tốn bộ nhớ máy.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>4. Chọn video từ máy</summary>
+        <ol class="os-ios">
+          <li>Bấm <b>Chọn video chính</b>.</li>
+          <li>Chọn <b>Thư viện ảnh</b> để lấy video trong app Ảnh, hoặc <b>Chọn tệp</b> nếu video nằm trong app Tệp (Files).</li>
+          <li>Chạm vào video → bấm <b>Thêm</b> / <b>Chọn</b>. Đợi vài giây, tên video hiện ra dưới nút.</li>
+          <li>Làm tương tự với <b>Chọn video chữ</b>.</li>
+        </ol>
+        <ol class="os-android" hidden>
+          <li>Bấm <b>Chọn video chính</b>.</li>
+          <li>Chọn video trong <b>Thư viện / Ảnh</b>, hoặc bấm <b>☰ / Duyệt</b> để tìm trong thư mục (Tải xuống, Zalo…).</li>
+          <li>Chạm vào video để chọn. Tên video hiện ra dưới nút.</li>
+          <li>Làm tương tự với <b>Chọn video chữ</b>.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>5. Ghép video</summary>
+        <ol>
+          <li>Chọn độ dày viền (mặc định <b>Mảnh</b>) và chất lượng (mặc định <b>Nhanh</b>).</li>
+          <li>Bấm <b>Ghép video</b>.</li>
+          <li><b>Lần đầu tiên</b> app tải bộ xử lý khoảng <b>32 MB</b>, nên dùng Wi-Fi. Các lần sau không cần tải lại.</li>
+          <li>Chờ thanh tiến trình chạy tới 100%. <b>Giữ màn hình sáng, không chuyển sang app khác.</b></li>
+          <li>Muốn dừng giữa chừng thì bấm <b>Hủy</b>.</li>
+        </ol>
+      </details>
+
+      <details id="huong-dan-luu">
+        <summary>6. Lưu video về máy</summary>
+        <ol class="os-ios">
+          <li>Khi thấy <b>✅ Xong!</b>, bấm <b>Lưu video về máy</b>.</li>
+          <li>Bảng chia sẻ của iPhone hiện lên → chọn <b>Lưu video</b> (Save Video).</li>
+          <li>Mở app <b>Ảnh</b> → video mới nằm ở cuối <b>Thư viện</b> / <b>Gần đây</b>.</li>
+          <li>Không thấy mục "Lưu video"? Chọn <b>Lưu vào Tệp</b> → chọn thư mục (ví dụ "Trên iPhone của tôi") → <b>Lưu</b>. Sau đó mở app <b>Tệp</b>, chạm giữ video → <b>Chia sẻ</b> → <b>Lưu video</b> để đưa vào Ảnh.</li>
+          <li>Muốn gửi thẳng qua Zalo/Messenger: trong bảng chia sẻ, chọn app đó.</li>
+        </ol>
+        <ol class="os-android" hidden>
+          <li>Khi thấy <b>✅ Xong!</b>, bấm <b>Lưu video về máy</b>.</li>
+          <li>Chrome tải file về. Trên màn hình có thể hiện thông báo tải xuống, bấm <b>Mở</b> để xem ngay.</li>
+          <li>File nằm trong thư mục <b>Tải xuống (Download)</b>, tên dạng <code>video_ghep_chu_…mp4</code>. Mở bằng app <b>Tệp / Files / Quản lý file</b> → <b>Tải xuống</b>.</li>
+          <li>Trong <b>Google Photos</b>: bấm <b>Thư viện</b> → <b>Download</b>. Trong <b>Thư viện Samsung</b>: mục <b>Album</b> → <b>Download</b>.</li>
+          <li>Muốn gửi thẳng qua Zalo/Facebook: bấm <b>Chia sẻ</b> rồi chọn app.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>7. Gặp lỗi thì làm gì?</summary>
+        <ul>
+          <li><b>Bấm chọn video mà không có gì xảy ra</b>: bạn đang mở trong Zalo/Facebook. Làm theo mục 1 để mở bằng Safari/Chrome.</li>
+          <li><b>Trang tự tải lại hoặc báo lỗi bộ nhớ khi đang ghép</b>: video quá dài/quá nặng so với máy. Đóng bớt app khác, chọn chất lượng <b>Nhanh</b>, hoặc dùng video ngắn hơn.</li>
+          <li><b>Chạy rất lâu</b>: máy yếu hoặc video dài. Chọn <b>Nhanh</b> và để máy cắm sạc.</li>
+          <li><b>Kẹt ở bước tải bộ xử lý</b>: kiểm tra mạng rồi bấm <b>Thử lại</b>.</li>
+          <li><b>Nền của video chữ vẫn hiện lên (xám mờ)</b>: nền video chữ chưa đen tuyệt đối. Hãy xuất lại video chữ với nền màu đen #000000.</li>
+          <li><b>Chữ bị mờ</b>: video chữ có độ phân giải thấp hơn video chính. Xuất video chữ đúng kích thước video chính.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>8. Quyền riêng tư</summary>
+        <p>Video của bạn <b>không được tải lên bất kỳ máy chủ nào</b>. Mọi xử lý diễn ra ngay trong trình duyệt trên điện thoại. Mạng chỉ được dùng để tải chính app và bộ xử lý (lần đầu).</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot">Ghép Chữ Video · dùng <a href="https://github.com/ffmpegwasm/ffmpeg.wasm" rel="noopener">ffmpeg.wasm</a> (FFmpeg, giấy phép LGPL/GPL)</footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
