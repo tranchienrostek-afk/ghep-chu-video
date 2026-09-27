@@ -25,10 +25,14 @@
   </header>
 
   <main>
-    <div id="inAppWarning" class="banner warn" hidden>
-      <strong>Bạn đang mở trong Zalo/Facebook.</strong>
-      Trình duyệt trong app này thường không cho chọn/lưu video. Bấm <b>⋯</b> ở góc trên → <b>Mở bằng trình duyệt</b>
-      (iPhone: Safari, Android: Chrome). <a href="#huong-dan-mo">Xem hướng dẫn</a>
+    <div id="inAppWarning" class="banner warn inapp" role="alert" hidden>
+      <strong>⚠️ Bạn đang mở trong Zalo / Messenger / Facebook</strong>
+      <p>Trình duyệt bên trong các app này <b>không cho lưu video về máy</b>: bấm "Lưu" sẽ không có gì xảy ra.
+        Hãy mở trang này bằng <b class="os-android-inline">Chrome</b><b class="os-ios-inline">Safari</b> trước khi ghép.</p>
+      <button id="openChromeBtn" class="primary" hidden>Mở bằng Chrome</button>
+      <button id="copyLinkBtn" class="secondary">Sao chép link</button>
+      <p class="hint" id="copyLinkHint">Hoặc: bấm <b>⋯</b> / <b>⋮</b> ở góc trên → <b>Mở bằng trình duyệt</b>.
+        Nếu không có mục đó: bấm <b>Sao chép link</b>, mở <b class="os-android-inline">Chrome</b><b class="os-ios-inline">Safari</b>, dán link vào thanh địa chỉ.</p>
     </div>
 
     <div id="installBanner" class="banner info" hidden>
@@ -103,14 +107,14 @@
       <button id="retryBtn" class="primary">Thử lại</button>
     </section>
 
-    <section class="guide" id="huong-dan">
-      <h2 class="guide-title">📖 Hướng dẫn sử dụng</h2>
+    <details class="guide" id="huong-dan">
+      <summary class="guide-title">📖 Hướng dẫn sử dụng <span class="guide-hint">bấm để xem</span></summary>
       <div class="tabs" role="tablist">
         <button role="tab" data-os="ios" aria-selected="true">iPhone / iPad</button>
         <button role="tab" data-os="android" aria-selected="false">Android</button>
       </div>
 
-      <details id="huong-dan-mo" open>
+      <details id="huong-dan-mo">
         <summary>1. Mở app đúng cách</summary>
         <ol class="os-ios">
           <li>Mở link app bằng <b>Safari</b> (biểu tượng la bàn xanh).</li>
@@ -182,6 +186,7 @@
       <details id="huong-dan-luu">
         <summary>6. Lưu video về máy</summary>
         <ol class="os-ios">
+          <li><b>Phải mở app bằng Safari.</b> Nếu mở từ Zalo/Messenger/Facebook, nút Lưu sẽ không hoạt động (xem mục 1).</li>
           <li>Khi thấy <b>✅ Xong!</b>, bấm <b>Lưu video về máy</b>.</li>
           <li>Bảng chia sẻ của iPhone hiện lên → chọn <b>Lưu video</b> (Save Video).</li>
           <li>Mở app <b>Ảnh</b> → video mới nằm ở cuối <b>Thư viện</b> / <b>Gần đây</b>.</li>
@@ -189,6 +194,7 @@
           <li>Muốn gửi thẳng qua Zalo/Messenger: trong bảng chia sẻ, chọn app đó.</li>
         </ol>
         <ol class="os-android" hidden>
+          <li><b>Phải mở app bằng Chrome.</b> Nếu mở từ Zalo/Messenger/Facebook, nút Lưu sẽ không hoạt động (xem mục 1).</li>
           <li>Khi thấy <b>✅ Xong!</b>, bấm <b>Lưu video về máy</b>.</li>
           <li>Chrome tải file về. Trên màn hình có thể hiện thông báo tải xuống, bấm <b>Mở</b> để xem ngay.</li>
           <li>File nằm trong thư mục <b>Tải xuống (Download)</b>, tên dạng <code>video_ghep_chu_…mp4</code>. Mở bằng app <b>Tệp / Files / Quản lý file</b> → <b>Tải xuống</b>.</li>
@@ -200,6 +206,7 @@
       <details>
         <summary>7. Gặp lỗi thì làm gì?</summary>
         <ul>
+          <li><b>Bấm "Lưu video về máy" mà không có gì xảy ra</b>: bạn đang mở trong Zalo/Messenger/Facebook. Mở lại bằng Chrome (Android) hoặc Safari (iPhone) theo mục 1, rồi ghép lại.</li>
           <li><b>Bấm chọn video mà không có gì xảy ra</b>: bạn đang mở trong Zalo/Facebook. Làm theo mục 1 để mở bằng Safari/Chrome.</li>
           <li><b>Trang tự tải lại hoặc báo lỗi bộ nhớ khi đang ghép</b>: video quá dài/quá nặng so với máy. Đóng bớt app khác, chọn chất lượng <b>Nhanh</b>, hoặc dùng video ngắn hơn.</li>
           <li><b>Chạy rất lâu</b>: máy yếu hoặc video dài. Chọn <b>Nhanh</b> và để máy cắm sạc.</li>
@@ -213,7 +220,7 @@
         <summary>8. Quyền riêng tư</summary>
         <p>Video của bạn <b>không được tải lên bất kỳ máy chủ nào</b>. Mọi xử lý diễn ra ngay trong trình duyệt trên điện thoại. Mạng chỉ được dùng để tải chính app và bộ xử lý (lần đầu).</p>
       </details>
-    </section>
+    </details>
   </main>
 
   <footer class="foot">Ghép Chữ Video · dùng <a href="https://github.com/ffmpegwasm/ffmpeg.wasm" rel="noopener">ffmpeg.wasm</a> (FFmpeg, giấy phép LGPL/GPL)</footer>

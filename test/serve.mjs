@@ -41,6 +41,6 @@ export function startServer(root = ROOT, port = PORT) {
   return new Promise((ok) => server.listen(port, "127.0.0.1", () => ok(server)));
 }
 
-if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, "/")}`) {
+if (process.argv[1] && import.meta.url === `file:///${process.argv[1].replace(/\\/g, "/")}`) {
   startServer().then(() => console.log(`http://127.0.0.1:${PORT}/`));
 }

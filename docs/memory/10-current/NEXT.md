@@ -2,6 +2,7 @@
 
 ## Next exact actions
 
+0. Nhờ người dùng mở link từ Zalo trên Android, bấm **Mở bằng Chrome**, rồi xác nhận Chrome mở đúng trang. Nếu không mở được, cần chuyển sang cách khác (vd. hướng dẫn ⋮ → Mở bằng trình duyệt).
 1. Mở link GitHub Pages trên **iPhone thật** (Safari), rồi làm đủ quy trình: chọn 2 video → Ghép → Lưu video → kiểm tra video đã vào app Ảnh.
 2. Làm tương tự trên **Android thật** (Chrome): kiểm tra file trong thư mục Download và thử nút Chia sẻ.
 3. Thử một video `.mov` HEVC quay trực tiếp bằng iPhone. Nếu ffmpeg.wasm báo lỗi giải mã, thêm hướng dẫn chuyển camera iPhone sang "Tương thích nhất", hoặc chuyển mã trước khi ghép.

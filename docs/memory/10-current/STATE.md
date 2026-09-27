@@ -16,7 +16,8 @@ PWA tĩnh "Ghép Chữ Video" (thư mục `app/`, đăng lên GitHub Pages từ 
 - Video đầu ra khớp **từng khung hình** với video chính, kể cả khi video chữ có nhịp khung không đều (VFR).
 - Video chữ khác kích thước được tự co giãn (scale2ref). Video chữ ngắn hơn: hết chữ thì chỉ còn video chính. Video chữ dài hơn: bị cắt theo video chính. Video chính không có tiếng: app không bị treo.
 - Có thanh tiến độ (đọc `time=` trong log, chia cho thời lượng). Nút Hủy dùng được cả khi đang tải lõi. Giữ màn hình sáng bằng wake lock.
-- Hướng dẫn chi tiết theo từng hệ điều hành ngay trong `index.html` (8 mục). Có cảnh báo khi app được mở trong Zalo/Facebook.
+- Hướng dẫn chi tiết theo từng hệ điều hành ngay trong `index.html` (8 mục), thu gọn thành một nút `<details id=huong-dan>`; link `#huong-dan-…` tự mở cả khung ngoài.
+- Trình duyệt nhúng (Zalo/Messenger/Facebook, Android WebView `; wv)`, iOS không có `Safari/`) được nhận diện ngay khi mở trang: hiện cảnh báo, nút **Mở bằng Chrome** (intent://, chỉ Android) và **Sao chép link**. Nút Lưu trong trình duyệt nhúng hiện hướng dẫn chuyển trình duyệt, không im lặng.
 - Service worker cache lõi 32 MB (cacheFirst cho `vendor/`, networkFirst cho giao diện).
 
 ## Current architecture / major subsystems
@@ -37,12 +38,15 @@ PWA tĩnh "Ghép Chữ Video" (thư mục `app/`, đăng lên GitHub Pages từ 
 
 ## Current risks / known inconsistencies
 
+- Người dùng thật (2026-09-27) mở link từ Zalo/Messenger trên Android: video ghép được nhưng bấm Lưu không có gì xảy ra, vì WebView bỏ qua lệnh tải blob. Đã xử lý bằng cảnh báo + chuyển sang Chrome. [Unverified] Chưa rõ nút intent:// có mở được Chrome từ trong Zalo thật không.
+
 - **Chưa thử trên iPhone và Android thật.** Mới kiểm thử trên WebKit (Playwright, Windows) và Chromium giả lập Pixel 7. Chưa rõ giới hạn bộ nhớ và tốc độ trên điện thoại thật.
 - Chưa thử video HEVC `.mov` quay từ iPhone. Lõi wasm có thể không có bộ giải mã HEVC.
 - Các tab hướng dẫn thiếu `aria-controls` và điều hướng bằng phím mũi tên (LOW).
 
 ## Verification baseline
 
+- `node test/ui.mjs`: đạt với 5 loại User-Agent (Chrome Android, WebView chung, Zalo, Messenger iOS, Safari iOS) và luồng Lưu trong WebView.
 - `node --test test/filter.test.mjs`: 8/8 ca đạt (ffmpeg desktop 8.1.2).
 - Link chạy thật: https://tranchienrostek-afk.github.io/ghep-chu-video/ (mọi file trả HTTP 200, wasm trả `application/wasm`).
 - `node test/e2e.mjs chromium fast` và `webkit fast` (máy chủ cục bộ): đạt. Có thể chạy trên link thật bằng `E2E_URL=<link>`.
