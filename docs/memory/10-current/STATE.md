@@ -32,6 +32,7 @@ PWA tĩnh "Ghép Chữ Video" (thư mục `app/`, đăng lên GitHub Pages từ 
 - Mọi URL trong app phải là **đường dẫn tương đối**, vì app được host dưới sub-path `/ghep-chu-video/`.
 - Không dùng `tpad` vô hạn khi không có `-t`: lệnh sẽ treo nếu video chính không có tiếng (đã xảy ra thật).
 - Không để `maskedmerge` nhận trực tiếp một input VFR. Video chữ phải đi qua `overlay` lên nền đen lấy từ video chính.
+- Không dùng `toBlobURL(..., true)` / `downloadWithProgress` của `@ffmpeg/util`: nó lỗi khi máy chủ nén gzip (GitHub Pages). Dùng `fetchWasmBlobURL` trong `engine.js`. Máy chủ thử nghiệm `test/serve.mjs` cố tình nén gzip để phát hiện lại lỗi này.
 - `navigator.share` trên iOS phải được gọi ngay trong lượt bấm của người dùng, không await gì trước nó.
 
 ## Current risks / known inconsistencies

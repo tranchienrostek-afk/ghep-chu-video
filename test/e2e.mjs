@@ -48,7 +48,12 @@ try {
   const t0 = Date.now();
   await page.click("#startBtn");
   await page.waitForSelector("#progressCard:not([hidden])");
-  await page.waitForFunction(() => /ghép chữ/i.test(document.getElementById("progressTitle").textContent), null, { timeout: 180_000 });
+  await page.waitForFunction(
+    () => /ghép chữ/i.test(document.getElementById("progressTitle").textContent) || !document.getElementById("errorCard").hidden,
+    null, { timeout: 180_000 });
+  if (await page.locator("#errorCard").isVisible()) {
+    throw new Error(`App báo lỗi khi tải lõi: ${await page.textContent("#errorMsg")}`);
+  }
   const tLoaded = Date.now();
   await page.waitForTimeout(3000);
   await page.screenshot({ path: `${OUT}/e2e_${tag}_3_progress.png` });

@@ -2,9 +2,11 @@
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize, resolve } from "node:path";
+import { gzipSync } from "node:zlib";
 
 const ROOT = resolve(process.argv[2] || "app");
 const PORT = Number(process.argv[3] || 8791);
+const GZIP_EXT = new Set([".wasm", ".js", ".css", ".html"]);
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -23,8 +25,14 @@ export function startServer(root = ROOT, port = PORT) {
       let file = normalize(join(root, urlPath));
       if (!file.startsWith(root)) { res.writeHead(403).end(); return; }
       if ((await stat(file).catch(() => null))?.isDirectory()) file = join(file, "index.html");
-      const body = await readFile(file);
-      res.writeHead(200, { "Content-Type": MIME[extname(file)] || "application/octet-stream" });
+      const raw = await readFile(file);
+      const headers = { "Content-Type": MIME[extname(file)] || "application/octet-stream" };
+      // Nén gzip giống GitHub Pages: Content-Length là kích thước BẢN NÉN, khác số byte trình duyệt nhận.
+      const gzip = GZIP_EXT.has(extname(file)) && /gzip/.test(req.headers["accept-encoding"] || "");
+      const body = gzip ? gzipSync(raw) : raw;
+      if (gzip) headers["Content-Encoding"] = "gzip";
+      headers["Content-Length"] = String(body.length);
+      res.writeHead(200, headers);
       res.end(body);
     } catch {
       res.writeHead(404).end("not found");
