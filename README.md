@@ -56,6 +56,16 @@ node test/e2e.mjs chromium fast           # hoặc: webkit fast
 node test/serve.mjs app 8791              # mở http://127.0.0.1:8791/
 ```
 
+## Cập nhật bản đang chạy (GitHub Pages)
+
+Trang được phục vụ từ nhánh `gh-pages`, chứa nội dung thư mục `app/`. Sau khi commit lên `main`:
+
+```bash
+git subtree push --prefix app origin gh-pages
+```
+
+Nếu có sửa file trong `app/vendor/`, nhớ tăng `VERSION` trong `app/sw.js` để máy người dùng tải lại bản mới.
+
 ## Giấy phép
 
 Mã của app dùng giấy phép MIT. `vendor/core` là bản build FFmpeg (có libx264) của dự án ffmpeg.wasm và tuân theo giấy phép GPL của FFmpeg/x264.

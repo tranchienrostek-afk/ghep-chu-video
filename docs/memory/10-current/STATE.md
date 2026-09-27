@@ -7,7 +7,7 @@ last_verified_commit: (first commit)
 
 ## System in one paragraph
 
-PWA tĩnh "Ghép Chữ Video" (thư mục `app/`, đăng qua GitHub Pages bằng `.github/workflows/pages.yml`). Người dùng iPhone (Safari iOS 15+) hoặc Android (Chrome) chọn 2 video từ máy: video chính và video chữ trắng nền đen. App ghép chữ lên video chính kèm viền tối, ngay trong trình duyệt bằng ffmpeg.wasm 0.12.10 (bản lõi đơn luồng, tự host trong `app/vendor/`). Kết quả lưu về máy: iPhone mở bảng chia sẻ để "Lưu video", Android tải file vào thư mục Download. Video không được gửi lên máy chủ nào. Thuật toán gốc lấy từ script desktop `../Chương trình xử lý.py` (bản đã duyệt 9/10).
+PWA tĩnh "Ghép Chữ Video" (thư mục `app/`, đăng lên GitHub Pages từ nhánh `gh-pages` bằng lệnh `git subtree push --prefix app origin gh-pages`; không dùng Actions vì token gh thiếu quyền `workflow`). Người dùng iPhone (Safari iOS 15+) hoặc Android (Chrome) chọn 2 video từ máy: video chính và video chữ trắng nền đen. App ghép chữ lên video chính kèm viền tối, ngay trong trình duyệt bằng ffmpeg.wasm 0.12.10 (bản lõi đơn luồng, tự host trong `app/vendor/`). Kết quả lưu về máy: iPhone mở bảng chia sẻ để "Lưu video", Android tải file vào thư mục Download. Video không được gửi lên máy chủ nào. Thuật toán gốc lấy từ script desktop `../Chương trình xử lý.py` (bản đã duyệt 9/10).
 
 ## Capabilities that must remain
 

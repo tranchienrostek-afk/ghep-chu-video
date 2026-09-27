@@ -21,7 +21,7 @@ Người dùng iPhone và Android dùng được app ngay từ một link, khôn
 
 ## Affected subsystems
 
-- `app/` (toàn bộ), `.github/workflows/pages.yml`.
+- `app/` (toàn bộ), nhánh `gh-pages` (bản sao `app/` qua subtree).
 
 ## Open hypotheses / unresolved questions
 
